@@ -37,9 +37,9 @@ resource "aws_security_group" "alb_sg" {
 
 resource "aws_lb" "alb" {
 
-  name               = "assessment-alb"
+  name = "assessment-alb"
 
-  internal           = false
+  internal = false
 
   load_balancer_type = "application"
 
