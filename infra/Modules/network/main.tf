@@ -71,3 +71,60 @@ resource "aws_subnet" "private_subnet_2" {
     Name = "private-subnet-2"
   }
 }
+
+resource "aws_eip" "nat_eip" {
+
+  domain = "vpc"
+
+  tags = {
+    Name = "assessment-nat-eip"
+  }
+}
+
+resource "aws_nat_gateway" "nat" {
+
+  allocation_id = aws_eip.nat_eip.id
+
+  subnet_id = aws_subnet.public_subnet_1.id
+
+  tags = {
+    Name = "assessment-nat"
+  }
+
+  depends_on = [
+    aws_internet_gateway.igw
+  ]
+}
+
+resource "aws_route_table" "public_rt" {
+
+  vpc_id = aws_vpc.main.id
+
+  route {
+
+    cidr_block = "0.0.0.0/0"
+
+    gateway_id = aws_internet_gateway.igw.id
+
+  }
+
+  tags = {
+    Name = "public-route-table"
+  }
+}
+
+resource "aws_route_table_association" "public_assoc_1" {
+
+  subnet_id = aws_subnet.public_subnet_1.id
+
+  route_table_id = aws_route_table.public_rt.id
+
+}
+
+resource "aws_route_table_association" "public_assoc_2" {
+
+  subnet_id = aws_subnet.public_subnet_2.id
+
+  route_table_id = aws_route_table.public_rt.id
+
+}
