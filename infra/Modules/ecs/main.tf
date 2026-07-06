@@ -123,3 +123,41 @@ resource "aws_ecs_task_definition" "nginx_task" {
     }
   ])
 }
+
+resource "aws_ecs_service" "ecs_service" {
+
+  name            = "assessment-ecs-service"
+  cluster         = aws_ecs_cluster.cluster.id
+  task_definition = aws_ecs_task_definition.nginx_task.arn
+
+  desired_count = 2
+
+  launch_type = "FARGATE"
+
+  network_configuration {
+
+    subnets = [
+      var.private_subnet_1_id,
+      var.private_subnet_2_id
+    ]
+
+    security_groups = [
+      aws_security_group.ecs_sg.id
+    ]
+
+    assign_public_ip = false
+  }
+
+  load_balancer {
+
+    target_group_arn = var.target_group_arn
+
+    container_name = "nginx"
+
+    container_port = 80
+  }
+
+  depends_on = [
+    aws_ecs_task_definition.nginx_task
+  ]
+}
