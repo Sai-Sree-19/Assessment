@@ -1,11 +1,17 @@
 #!/bin/bash
 
-DB_HOST=$1
-DB_NAME=$2
-DB_USER=$3
+set -e
 
-BACKUP_FILE="backup_$(date +%Y%m%d_%H%M%S).sql"
+TIMESTAMP=$(date +"%Y%m%d_%H%M%S")
 
-pg_dump -h "$DB_HOST" -U "$DB_USER" "$DB_NAME" > "$BACKUP_FILE"
+mkdir -p backups
 
-echo "Backup created: $BACKUP_FILE"
+docker exec assessment-postgres \
+pg_dump \
+-U postgres \
+-d assessmentdb \
+> backups/assessmentdb_$TIMESTAMP.sql
+
+echo "Backup completed"
+
+echo "File : backups/assessmentdb_$TIMESTAMP.sql"

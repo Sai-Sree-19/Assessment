@@ -1,10 +1,25 @@
 #!/bin/bash
 
-DB_HOST=$1
-DB_NAME=$2
-DB_USER=$3
-BACKUP_FILE=$4
+set -e
 
-psql -h "$DB_HOST" -U "$DB_USER" "$DB_NAME" < "$BACKUP_FILE"
+if [ -z "$1" ]; then
+    echo "Usage: ./restore.sh backup.sql"
+    exit 1
+fi
+
+docker exec assessment-postgres \
+psql \
+-U postgres \
+-c "DROP DATABASE IF EXISTS assessmentdb;"
+
+docker exec assessment-postgres \
+psql \
+-U postgres \
+-c "CREATE DATABASE assessmentdb;"
+
+cat "$1" | docker exec -i assessment-postgres \
+psql \
+-U postgres \
+-d assessmentdb
 
 echo "Restore completed."
