@@ -1,0 +1,27 @@
+version: "3.9"
+
+services:
+
+  postgres:
+
+    image: postgres:15
+
+    container_name: assessment-postgres
+
+    restart: unless-stopped
+
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: assessmentdb
+
+    ports:
+      - "5432:5432"
+
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./database:/docker-entrypoint-initdb.d
+
+volumes:
+
+  postgres-data:
